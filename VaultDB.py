@@ -230,73 +230,55 @@ class StatsFrame(tk.Frame):
 
 
 def get_db_data():
-    """ Method to get the data from the database and return it as a tuple consisting
-    of a list of the names of the columns and a list of the actualy data in tuple format."""
     con = MySQLdb.connect(host=Vault.host, user=Vault.user,
                           passwd=Vault.passwd, database="vault")
     cursor = con.cursor()
 
     cols = [
-        "id_product", "name", "category", "stock_available", "selling_price"
+        "barCode", "name", "aisle", "itemsAvailable", "cost"
     ]
-
-    # Create the table if it doesn't already exist. This will allow it to work in any DB.
-    cursor.execute("""CREATE TABLE IF NOT EXISTS `products` (
-        id_product VARCHAR(12) NOT NULL PRIMARY KEY,
-        name VARCHAR(60) NOT NULL,
-        category VARCHAR(60) NOT NULL,
-        stock_available INT UNSIGNED NOT NULL DEFAULT 0,
-        selling_price DECIMAL(13,2) UNSIGNED NOT NULL DEFAULT 0.00
+    cursor.execute("""Recreate Table `items` (
     ) ENGINE=InnoDB""")
 
     cursor.execute(
-        f"SELECT {','.join(cols)} FROM products")
+        f"SELECT {','.join(cols)} From Items")
     data = cursor.fetchall()
     con.close()
 
     data_df = pd.DataFrame(data, columns=cols).set_index(
-        "id_product")
+        "barCode")
     return data_df
 
 
 def add_df_to_db(df):
-    con = MySQLdb.connect(host=Vault.host, user=Vault.user,
-                          passwd=Vault.passwd, database="vault")
+    con = MySQLdb.connect(host=Vault.host, passwd=Vault.passwd, database="vault")
     cursor = con.cursor()
 
-    # Firstly, get original dataframe, using get_db_data()
     left_df = get_db_data()
-
-    # Then, compare the the two and only take the ones that have differences
     out_df = left_df.merge(df, how="outer", indicator="shared")
     out_df = out_df[out_df["shared"] != "both"]
 
     out_df.drop(["shared"], axis=1, inplace=True)
-    # out_df.reset_index(level=0, inplace=True)
-    out_df["id_product"] = out_df.index
+    out_df["barCode"] = out_df.index
 
     return
 
     if len(out_df) == 0:
-        tkMessageBox.showinfo(title="DataBase Update Complete",
-                              message="Nothing was added to the DB as no changes were detected between the different datasets.")
+        tkMessageBox.showinfo(title="DataBase Updated", message="No Changes.")
         return
 
     cols = "`,`".join([str(i) for i in out_df.columns.tolist()])
-    # for _, row in out_df.iterrows():
-    sql = "INSERT INTO `products` (`" + cols + \
-        "`) VALUES (" + "%s," * (len(row)-1) + "%s)"
+    sql = "INSERT INTO `products` (`" + cols + \ "`) VALUES (" + "%s," * (len(row)-1) + "%s)"
 
     try:
-        cursor.executemany(sql, tuple(map(lambda _,row: ,
-            out_df.iterrows())))
+        cursor.executemany(sql, tuple(map(lambda _,row: ,out_df.iterrows())))
         con.commit()
-        tkMessageBox.showinfo(title="Save Successful",
-                                message="Save Completed Successfully!")
+        tkMessageBox.showinfo(title="Done",
+                                message="Save Completed!")
     except:
         con.rollback()
         tkMessageBox.showerror(title="Save Failed",
-                                message="The data was not saved to the DB.")
+                                message="Error, Incomplete.")
 
     con.close()
 
