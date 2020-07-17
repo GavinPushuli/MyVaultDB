@@ -13,10 +13,9 @@ from pandastable import Table, TableModel
 
 class Vault(object):
     host = "localhost"
-    user="root"
+    user= "root"
     passwd = "380@MySQL"
     data = pd.DataFrame()
-
 
 class System (tk.Tk):
     def __init__(self):
@@ -26,7 +25,6 @@ class System (tk.Tk):
         self.fonts = {
             "title": tkfont.Font(Device="Program")
         }
-
         self.tabs = [
             DataFrame,
             StatsFrame
@@ -53,7 +51,6 @@ class System (tk.Tk):
 
         self.tab_container = tk.Frame(self, bg="#fff")
         self.tab_container.grid(row=2, column=0, sticky="")
-        # Set tab_container 0 index row & column to weight of 1
         self.tab_container.rowconfigure(index=0, weight=1)
         self.tab_container.columnconfigure(index=0, weight=1)
 
@@ -80,9 +77,8 @@ class System (tk.Tk):
             else:
                 self.tab_buttons[idx]["state"] = "normal"
 
-
 class DataFrame(tk.Frame):
-    label = "View Data"
+    label = "Data"
 
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
@@ -95,20 +91,19 @@ class DataFrame(tk.Frame):
         self.tkraise()
 
     def create_widgets(self):
-        # Create buttons to manage the DB.
         self.toolbar = tk.Frame(self)
         self.toolbar.grid(row=0, column=0, padx=12, pady=3, sticky="NSEW")
         for col in range(12):
             self.toolbar.columnconfigure(index=col, weight=1)
 
         self.save_button = tk.Button(
-            self.toolbar, text="Save to vault", command=self.save_to_db)
+            self.toolbar, text="Store in vault", command=self.save_to_db)
         self.export_button = tk.Button(
-            self.toolbar, text="Export Data to File", command=self.export_data)
+            self.toolbar, text="Export File", command=self.export_data)
         self.import_button = tk.Button(
-            self.toolbar, text="Import Data from CSV", command=self.import_csv)
+            self.toolbar, text="Import CSV", command=self.import_csv)
         self.refresh_button = tk.Button(
-            self.toolbar, text="Refresh Data from DB", command=self.refresh_table_data)
+            self.toolbar, text="Refresh DB", command=self.refresh_table_data)
 
         self.save_button.grid(row=0, column=12)
         self.export_button.grid(row=0, column=11)
@@ -116,8 +111,9 @@ class DataFrame(tk.Frame):
         self.refresh_button.grid(row=0, column=9)
 
         self.table_container = tk.Frame(self)
-        self.table_container.grid(row=1, column=0, sticky="NSEW")
-        # Create table to display data
+        self.table_container.grid(row=1, column=0, sticky="")
+        
+                                                  #Create table
         data_df = Vault.data
 
         self.data_table = Table(self.table_container, dataframe=data_df)
@@ -141,8 +137,7 @@ class DataFrame(tk.Frame):
     def export_data(self):
         output_file = tkFileDialog.askopenfilename()
         if not output_file:
-            tkMessageBox.showerror(title="Error, Failed!",
-                                   message="...")
+            tkMessageBox.showerror(title="Error, Failed!", message="...")
             return
 
     def save_to_db(self):
@@ -151,8 +146,7 @@ class DataFrame(tk.Frame):
     def import_csv(self):
         input_file = tkFileDialog.askopenfilename()
         if not input_file.strip():
-            tkMessageBox.showerror(title="Error, Failed!",
-                                   message="...")
+            tkMessageBox.showerror(title="Error, Failed!", message="...")
             return
 
         try:
@@ -172,8 +166,7 @@ class DataFrame(tk.Frame):
 
             tkMessageBox.showinfo(title="Done",message="Pass")
         else:
-            tkMessageBox.showinfo(title="Error, Failed!",
-                                   message="...")
+            tkMessageBox.showinfo(title="Error, Failed!", message="...")
 
 
 class StatsFrame(tk.Frame):
@@ -209,7 +202,6 @@ class StatsFrame(tk.Frame):
         Vault.data = get_db_data()
         products_df = Vault.data
 
-        # Create the matplotlib figure and axes that will be used to display the graphs for the statistics.
         fig = Figure(figsize=(15, 5), dpi=100)
 
         ax1 = fig.add_subplot(1, 3, 1)
@@ -218,7 +210,6 @@ class StatsFrame(tk.Frame):
 
         fig.subplots_adjust(bottom=.25)
 
-        # Create different statistics and plot them the figure previously defined.
         products_df.groupby(["category"]).size().plot(ax=ax1, y="stock_available", kind="bar", grid=True,
                                                       title="Number of Items per Category")
         products_df.groupby(["category"]).sum().plot(ax=ax2, y="stock_available", kind="bar", grid=True,
@@ -230,8 +221,7 @@ class StatsFrame(tk.Frame):
 
 
 def get_db_data():
-    con = MySQLdb.connect(host=Vault.host, user=Vault.user,
-                          passwd=Vault.passwd, database="vault")
+    con = MySQLdb.connect(host=Vault.host, user=Vault.user, passwd=Vault.passwd, database="vault")
     cursor = con.cursor()
 
     cols = [
