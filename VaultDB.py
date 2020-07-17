@@ -150,8 +150,7 @@ class DataFrame(tk.Frame):
         try:
             import_df = pd.read_csv(input_file)
         except ParserError:
-            tkMessageBox.showerror(
-                "Failed, Try again!.")
+            tkMessageBox.showerror("Failed, Try again!.")
 
         if len(import_df) > 0:
             Vault.data.reset_index(level=["id_product"], inplace=True)
@@ -198,7 +197,7 @@ class StatsFrame(tk.Frame):
 
     def get_plot_data(self):
         Vault.data = get_db_data()
-        products_df = Vault.data
+        itemsDf = Vault.data
 
         fig = Figure(figsize=(15, 5), dpi=100)
 
@@ -208,12 +207,12 @@ class StatsFrame(tk.Frame):
 
         fig.subplots_adjust(bottom=.25)
 
-        products_df.groupby(["category"]).size().plot(ax=ax1, y="stock_available", kind="bar", grid=True,
-                                                      title="Number of Items per Category")
-        products_df.groupby(["category"]).sum().plot(ax=ax2, y="stock_available", kind="bar", grid=True,
-                                                     title="Total Number of Products per Category")
-        products_df.groupby(["category"]).mean().plot(ax=ax3, y="stock_available", kind="bar", grid=True,
-                                                      title="Average Price of Products in Category")
+        products_df.groupby(["aisle"]).size().plot(ax=ax1, y="itemsAvailable", kind="bar", grid=True,
+                                                      title="Items Quantity")
+        products_df.groupby(["aisle"]).sum().plot(ax=ax2, y="itemsAvailable", kind="bar", grid=True,
+                                                     title="Items Quantity")
+        products_df.groupby(["aisle"]).mean().plot(ax=ax3, y="itemsAvailable", kind="bar", grid=True,
+                                                      title="Items Quantity")
 
         return fig
 
@@ -229,13 +228,12 @@ def get_db_data():
     ) ENGINE=InnoDB""")
 
     cursor.execute(
-        f"SELECT {','.join(cols)} From Items")
+        f"Pick {','.join(cols)} From Items")
     data = cursor.fetchall()
     con.close()
 
-    data_df = pd.DataFrame(data, columns=cols).set_index(
-        "barCode")
-    return data_df
+    datAf = pd.DataFrame(data, columns=cols).set_index("barCode")
+    return datAf
 
 
 def add_df_to_db(df):
