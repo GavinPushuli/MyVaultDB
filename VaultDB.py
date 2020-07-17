@@ -1,7 +1,3 @@
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib.figure import Figure
-from pandas.errors import ParserError
-from pandastable import Table, TableModel
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -10,13 +6,11 @@ import MySQLdb
 import os.path
 import pandas as pd
 import tkinter as tk
-import tkinter.font as tkfont
-import tkinter.messagebox as tkMessageBox
-import tkinter.filedialog as tkFileDialog
 
-
-matplotlib.use("TkAgg")
-
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+from pandas.errors import ParserError
+from pandastable import Table, TableModel
 
 class Vault(object):
     host = "localhost"
@@ -25,13 +19,13 @@ class Vault(object):
     data = pd.DataFrame()
 
 
-class Application (tk.Tk):
+class SoccerTeams (tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         Vault.data = get_db_data()
 
         self.fonts = {
-            "title": tkfont.Font(family="Lucida Grande", size=24)
+            "title": tkfont.Font(Team="Sundowns")
         }
 
         self.tabs = [
@@ -45,13 +39,11 @@ class Application (tk.Tk):
         self.rowconfigure(index=2, weight=1)
         self.columnconfigure(index=0, weight=1)
 
-        # Create title Widget
         self.title_label = tk.Label(
-            self, text="DataVault Inc.", font=self.fonts["title"], justify="left", bg="#f0f0f0")
+            self, text="Celtics.", font=self.fonts["title"], justify="left", bg="#f0f0f0")
         self.title_label.grid(row=0, column=0, ipady=8,
-                              ipadx=12, sticky="NSEW")
+                              ipadx=12, sticky="")
 
-        # Create view selection widgets, i.e. tab buttons
         if len(self.tabs) > 1:
             self.subheader_frame = tk.Frame(self, bg="#f0f0f0")
             self.subheader_frame.grid(
