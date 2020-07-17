@@ -1,4 +1,3 @@
-
 import matplotlib
 import matplotlib.pyplot as plt
 import math
@@ -19,13 +18,13 @@ class Vault(object):
     data = pd.DataFrame()
 
 
-class SoccerTeams (tk.Tk):
+class System (tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         Vault.data = get_db_data()
 
         self.fonts = {
-            "title": tkfont.Font(Team="Sundowns")
+            "title": tkfont.Font(Device="Program")
         }
 
         self.tabs = [
@@ -40,22 +39,20 @@ class SoccerTeams (tk.Tk):
         self.columnconfigure(index=0, weight=1)
 
         self.title_label = tk.Label(
-            self, text="Celtics.", font=self.fonts["title"], justify="left", bg="#f0f0f0")
+            self, text="Mobile.", font=self.fonts["title"], justify="left", bg="#f0f0f0")
         self.title_label.grid(row=0, column=0, ipady=8,
                               ipadx=12, sticky="")
 
         if len(self.tabs) > 1:
             self.subheader_frame = tk.Frame(self, bg="#f0f0f0")
             self.subheader_frame.grid(
-                row=1, column=0, ipady="8", sticky="NSEW")
+                row=1, column=0, ipady="8", sticky="")
 
-            # Set subheader_frame to have 8 columns.
-            for col in range(12):
+            for col in range(10):
                 self.subheader_frame.columnconfigure(index=col, weight=1)
 
-        # Create container for actual tabs.
         self.tab_container = tk.Frame(self, bg="#fff")
-        self.tab_container.grid(row=2, column=0, sticky="NSEW")
+        self.tab_container.grid(row=2, column=0, sticky="")
         # Set tab_container 0 index row & column to weight of 1
         self.tab_container.rowconfigure(index=0, weight=1)
         self.tab_container.columnconfigure(index=0, weight=1)
@@ -63,18 +60,17 @@ class SoccerTeams (tk.Tk):
         self.tab_buttons = []
         for idx, tab in enumerate(self.tabs):
             if len(self.tabs) > 1:
-                # Create tab buttons
+         
                 t = tk.Button(self.subheader_frame, text=tab.label, relief="ridge",
                               command=lambda index=idx: self.set_tab(index))
 
                 self.tab_buttons.append(t)
-                self.tab_buttons[idx].grid(ipadx=10, ipady=5, sticky="NSEW",
+                self.tab_buttons[idx].grid(ipadx=10, ipady=5, sticky="",
                                            row=0, column=(6 - math.floor(len(self.tabs) / 2) + idx),
                                            columnspan=(len(self.tabs) % 2 + 1))
 
-            # Create tab frames
             self.tabs[idx] = tab(master=self.tab_container)
-            self.tabs[idx].grid(row=0, column=0, sticky="NSEW")
+            self.tabs[idx].grid(row=0, column=0, sticky="")
 
     def set_tab(self, frame_idx):
         for idx, _ in enumerate(self.tab_buttons):
@@ -106,7 +102,7 @@ class DataFrame(tk.Frame):
             self.toolbar.columnconfigure(index=col, weight=1)
 
         self.save_button = tk.Button(
-            self.toolbar, text="Save Data To DB", command=self.save_to_db)
+            self.toolbar, text="Save to vault", command=self.save_to_db)
         self.export_button = tk.Button(
             self.toolbar, text="Export Data to File", command=self.export_data)
         self.import_button = tk.Button(
@@ -129,9 +125,9 @@ class DataFrame(tk.Frame):
         self.data_table.show()
 
     def refresh_table_data(self):
-        res = tkMessageBox.askyesno(title="Are you sure you want to refresh the DB.",
-                                    message="Are you sure that you want to refresh the DB.\n"
-                                    "This will undo any changes that you made before saving your data. This includes CSV file that you have imported")
+        res = tkMessageBox.askyesno(title="Ready to reboot DB.",
+                                    message="Ready to reboot DB.\n"
+                                    "Undo")
 
         if res == tkMessageBox.NO:
             return
@@ -145,29 +141,27 @@ class DataFrame(tk.Frame):
     def export_data(self):
         output_file = tkFileDialog.askopenfilename()
         if not output_file:
-            tkMessageBox.showerror(title="Export Failed",
-                                   message="Export failed as no file was selected.")
+            tkMessageBox.showerror(title="Error, Failed!",
+                                   message="...")
             return
 
     def save_to_db(self):
         add_df_to_db(Vault.data)
 
     def import_csv(self):
-        # Get file to import
         input_file = tkFileDialog.askopenfilename()
         if not input_file.strip():
-            tkMessageBox.showerror(title="Import Failed",
-                                   message="Import failed as no file was selected.")
+            tkMessageBox.showerror(title="Error, Failed!",
+                                   message="...")
             return
 
         try:
             import_df = pd.read_csv(input_file)
         except ParserError:
             tkMessageBox.showerror(
-                "The supplied file is not a valid CSV file, could not import.")
+                "Failed, Try again!.")
 
         if len(import_df) > 0:
-            # Data was loaded.
             Vault.data.reset_index(level=["id_product"], inplace=True)
             table_df = Vault.data.append(import_df, ignore_index=False)
             table_df.set_index("id_product", inplace=True)
@@ -176,11 +170,10 @@ class DataFrame(tk.Frame):
             self.data_table.updateModel(TableModel(table_df))
             self.data_table.redraw()
 
-            tkMessageBox.showinfo(title="Import Successful",
-                                  message="Import Completed Successfully!")
+            tkMessageBox.showinfo(title="Done",message="Pass")
         else:
-            tkMessageBox.showinfo(title="Import Failed",
-                                  message="Input file did not have any CSV data so no data was added.")
+            tkMessageBox.showinfo(title="Error, Failed!",
+                                   message="...")
 
 
 class StatsFrame(tk.Frame):
@@ -202,7 +195,6 @@ class StatsFrame(tk.Frame):
         self.tkraise()
 
     def plt_show(self, f):
-        """Method to add the matplotlib graph onto a tkinter window."""
         canvas = FigureCanvasTkAgg(f, self)
         canvas.draw()
 
@@ -211,10 +203,9 @@ class StatsFrame(tk.Frame):
                 tick.set_rotation(35)
 
         self.plot_widget = canvas.get_tk_widget()
-        self.plot_widget.grid(row=0, column=0, sticky="NSEW")
+        self.plot_widget.grid(row=0, column=0, sticky="")
 
     def get_plot_data(self):
-        # Get a data from DB and import into pandas.DataFrame
         Vault.data = get_db_data()
         products_df = Vault.data
 
