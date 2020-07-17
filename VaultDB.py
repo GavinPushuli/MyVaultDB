@@ -38,8 +38,7 @@ class System (tk.Tk):
 
         self.title_label = tk.Label(
             self, text="Mobile.", font=self.fonts["title"], justify="left", bg="#f0f0f0")
-        self.title_label.grid(row=0, column=0, ipady=8,
-                              ipadx=12, sticky="")
+        self.title_label.grid(row=0, column=0, ipady=8, ipadx=12, sticky="")
 
         if len(self.tabs) > 1:
             self.subheader_frame = tk.Frame(self, bg="#f0f0f0")
@@ -111,9 +110,8 @@ class DataFrame(tk.Frame):
         self.refresh_button.grid(row=0, column=9)
 
         self.table_container = tk.Frame(self)
-        self.table_container.grid(row=1, column=0, sticky="")
+        self.table_container = tk.Frame(self) self.table_container.grid(row=1, column=0, sticky="")
         
-                                                  #Create table
         data_df = Vault.data
 
         self.data_table = Table(self.table_container, dataframe=data_df)
@@ -170,7 +168,7 @@ class DataFrame(tk.Frame):
 
 
 class StatsFrame(tk.Frame):
-    label = "View Stats"
+    label = "Status"
 
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
@@ -258,20 +256,17 @@ def add_df_to_db(df):
         return
 
     cols = "`,`".join([str(i) for i in out_df.columns.tolist()])
-    sql = "INSERT INTO `products` (`" + cols + \ "`) VALUES (" + "%s," * (len(row)-1) + "%s)"
+    sql = "Place in `items` (`" + cols + \ "`) VALUES (" + "%s," * (len(row)-1) + "%s)"
 
     try:
         cursor.executemany(sql, tuple(map(lambda _,row: ,out_df.iterrows())))
         con.commit()
-        tkMessageBox.showinfo(title="Done",
-                                message="Save Completed!")
+        tkMessageBox.showinfo(title="Done", message="Save Completed!")
     except:
         con.rollback()
-        tkMessageBox.showerror(title="Save Failed",
-                                message="Error, Incomplete.")
+        tkMessageBox.showerror(title="Save Failed", message="Error, Incomplete.")
 
     con.close()
 
-
-app = Application()
+app = System()
 app.mainloop()
