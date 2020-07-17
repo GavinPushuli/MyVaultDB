@@ -21,7 +21,7 @@ matplotlib.use("TkAgg")
 class Vault(object):
     host = "localhost"
     user="root"
-    passwd = "380@MySQL?"
+    passwd = "380@MySQL"
     data = pd.DataFrame()
 
 
